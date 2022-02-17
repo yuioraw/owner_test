@@ -1,14 +1,12 @@
-package testwithjenkins;
+package yuioraw;
 
 import com.codeborne.selenide.Configuration;
-import helpers.Attach;
+import yuioraw.helpers.Attachments;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import static com.codeborne.selenide.Selenide.closeWebDriver;
-
-public class BaseTest {
+public class TestBase {
 
     @BeforeAll
     static void setup() {
@@ -23,11 +21,10 @@ public class BaseTest {
     }
 
     @AfterEach
-    void afterEach() {
-        Attach.screenshotAs("Last screenshot");
-        Attach.pageSource();
-        Attach.browserConsoleLogs();
-        Attach.addVideo();
-        closeWebDriver();
+    void addAttachments() {
+        Attachments.takeScreenshot();
+        Attachments.takePageSource();
+        Attachments.addVideo();
+        Attachments.browserConsoleLogs();
     }
 }

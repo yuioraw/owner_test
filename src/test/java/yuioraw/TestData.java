@@ -1,4 +1,4 @@
-package testwithjenkins;
+package yuioraw;
 
 import com.github.javafaker.Faker;
 
