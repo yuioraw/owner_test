@@ -1,99 +1,60 @@
 package yuioraw;
 
-import com.codeborne.selenide.SelenideElement;
-import org.junit.jupiter.api.Assertions;
+import yuioraw.RegistrationPage;
+import io.qameta.allure.Link;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
-import static io.qameta.allure.Allure.step;
+import static yuioraw.TestData.*;
+
 
 public class PracticeFormTests extends TestBase {
 
+    RegistrationPage registrationPage = new RegistrationPage();
+
     @Test
-    void successTest() {
-        step("открываем нужный репо", () -> {
-            open("/automation-practice-form");
-            $(".practice-form-wrapper").shouldHave(text("Student Registration Form"));
-        });
-        step("вводим имя и фамилию", () -> {
-            $("#firstName").setValue("Veronika");
-            $("#lastName").setValue("Padgok");
+    @Tag("main")
+    @Owner("berezkindv")
+    @DisplayName("Тест заполнения формы регистрации студента")
+    @Severity(SeverityLevel.BLOCKER)
+    @Link(value = "Форма регистрации", url = "https://demoqa.com/automation-practice-form")
+    void fillFormTests() {
 
-        });
-        step("вводим email", () -> {
-            $("#userEmail").setValue("testForm@mailinator.com");
-        });
-        step("выбираем пол", () -> {
-            $("#gender-radio-2").parent().click();
-        });
-        step("вводим номер  телефона", () -> {
-            $("#userNumber").setValue("1234543456");
-        });
-        step("вводим дату рождения", () -> {
-            $("#dateOfBirthInput").click();
-            $(".react-datepicker__month-select").selectOption("November");
-            $(".react-datepicker__year-select").selectOption("1984");
-            $(".react-datepicker__day--018").click();
-        });
-        step("выбираем любимый предмет", () -> {
-            $("#subjectsContainer").click();
-            $("#subjectsInput").setValue("Maths").pressEnter();
-        });
-
-        step("выбираем хобби", () ->
-        {
-            $("[for= hobbies-checkbox-2]").click();
-        });
-
-        //$("#uploadPicture").uploadFromClasspath("text.txt");
-        step("вводим адрес проживания", () -> {
-            $("#currentAddress").setValue("Minsk, 220117");
-        });
-        step("выбираем штат и город", () -> {
-            $("#state").scrollTo().click();
-
-            $("#state").$(byText("NCR")).click();
-
-            $("#city").click();
-
-            $("#city").$(byText("Delhi")).click();
-
-            $("#submit").click();
-        });
-        step("делаем проверку", () -> {
-            SelenideElement table = $(".modal-body").$("table").$("tbody");
-            Assertions.assertEquals("Veronika Padgok", table.$("tr:nth-child(1)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("testForm@mailinator.com", table.$("tr:nth-child(2)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("Female", table.$("tr:nth-child(3)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("1234543456", table.$("tr:nth-child(4)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("18 November,1984", table.$("tr:nth-child(5)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("Maths", table.$("tr:nth-child(6)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("Reading", table.$("tr:nth-child(7)").
-                    $("td:nth-child(2)").
-                    getText());
-            //Assertions.assertEquals("text.txt", table.$("tr:nth-child(8)").$("td:nth-child(2)").getText());
-            Assertions.assertEquals("Minsk, 220117", table.$("tr:nth-child(9)").
-                    $("td:nth-child(2)").
-                    getText());
-            Assertions.assertEquals("NCR Delhi", table.$("tr:nth-child(10)").
-                    $("td:nth-child(2)").
-                    getText());
-        });
-
+        registrationPage
+                .openPage()
+                .typeFirstName(firstName)
+                .typeLastName(lastName)
+                .typeUserEmail(userEmail)
+                .typeUserNumber(userNumber)
+                .typeCurrentAddress(currentAddress)
+                .fillSubjectField(subject)
+                .genderSelectGender(gender)
+                .hobbiesCheckBoxSelect(hobbiesSports)
+                .hobbiesCheckBoxSelect(hobbiesReading)
+                .hobbiesCheckBoxSelect(hobbiesMusic)
+//                .uploadFile("img/1.png")
+                .fillStateField()
+                .fillCityField();
+        registrationPage.calendarComponent.setBirthDate("12", "April", "1961");
+        registrationPage.pushSubmitButton();
+//        Asserts
+        registrationPage
+                .assertFormTitle("Thanks for submitting the form")
+                .assertsForm("Student Name", firstName + " " + lastName)
+                .assertsForm("Student Email", userEmail)
+                .assertsForm("Gender", gender)
+                .assertsForm("Mobile",userNumber)
+                .assertsForm("Date of Birth", "12 April,1961")
+                .assertsForm("Subjects", subject)
+                .assertsForm("Hobbies", hobbiesSports + "," + " " + hobbiesReading + "," + " " + hobbiesMusic)
+//                .assertsForm("Picture", "1.png")
+                .assertsForm("Address", currentAddress)
+                .assertsForm("State and City", state + " " + city)
+                .closeTable();
+        registrationPage.assertFormTitleNegative();
     }
 }

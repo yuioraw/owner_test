@@ -1,47 +1,49 @@
 plugins {
     id 'java-library'
-    id 'io.qameta.allure' version '2.9.6'
+    id "io.qameta.allure" version "2.9.6"
 }
 
 repositories {
     mavenCentral()
 }
 
+def allureVersion = "2.17.2",
+    junitVersion = "5.8.2"
+
 allure {
     report {
-        version.set("2.17.2")
+        version.set(allureVersion)
     }
     adapter {
         autoconfigure.set(true)
         aspectjWeaver.set(true)
         frameworks {
             junit5 {
-                adapterVersion.set("2.17.2")
+                adapterVersion.set(allureVersion)
             }
         }
     }
 }
 
 dependencies {
-    testImplementation (
-            'com.codeborne:selenide:6.2.1',
-            'org.junit.jupiter:junit-jupiter:5.8.2',
-            'io.qameta.allure:allure-selenide:2.17.2',
-            'com.github.javafaker:javafaker:1.0.2')
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.22'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
-}
-
-test {
-    useJUnitPlatform()
+    testImplementation(
+            "com.codeborne:selenide:6.3.2",
+            "io.qameta.allure:allure-selenide:$allureVersion",
+            "org.junit.jupiter:junit-jupiter-api:$junitVersion",
+            'org.aeonbits.owner:owner:1.0.12',
+            "com.github.javafaker:javafaker:1.0.2"
+    )
+    testRuntimeOnly(
+            'org.slf4j:slf4j-simple:1.7.36',
+            "org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
 tasks.withType(Test) {
     useJUnitPlatform()
-    systemProperties(System.getProperties())
-//    systemProperty("browser", "safari") - stable property
+    systemProperties(System.getProperties()) // основная команда для работы со значениями задаваемыми через терминал
+
+//    systemProperty("browser", "safari") // жестко задаем переменной browser значение safari // нельза поменять даже из терминала
+//    systemProperty("enviroment", System.getProperty("enviroment", "stage")) // строка для разделения запуска на разных окружениях
 
     testLogging {
         lifecycle {
@@ -52,15 +54,14 @@ tasks.withType(Test) {
     }
 }
 
-task properties_tests(type: Test) {
+task main_tests(type: Test) {
     useJUnitPlatform{
-        includeTags "properties"
+        includeTags "main"
     }
 }
 
-task try_tests(type: Test) {
+task owner_tests(type: Test) {
     useJUnitPlatform{
-        println('here')
-        includeTags "try"
+        includeTags "owner"
     }
 }
